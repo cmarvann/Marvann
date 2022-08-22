@@ -2,7 +2,7 @@ const inquirer = require('inquirer');
 
 
 
-// const generatePage = require('./src/page-template.js');
+const generatePage = require('./src/page-template.js');
 
 // const pageHTML = generatePage(name, github);
 
@@ -63,8 +63,24 @@ const promptUser = () => {
         name: 'about',
         message: 'Provide  information about yourself:',
         when: ({ confirmAbout }) => confirmAbout
-      },
+      }
+    ]);
+};
 
+// Array
+const promptProject = portfolioData => {
+    console.log(`
+  =================
+  ProfessionalREADME Project
+  =================
+  `);
+
+  if (!portfolioData.projects) {
+    portfolioData.projects = [];
+  }
+
+  return inquirer
+ .prompt([
     {
         type: 'input',
         name: 'title',
@@ -131,7 +147,27 @@ const promptUser = () => {
     }
 }
 
-]);
+])
+
+.then(projectData => {
+    portfolioData.projects.push(projectData);
+    if (projectData.confirmAddProject) {
+      return promptProject(portfolioData);
+    } else {
+      return portfolioData;
+    }
+  });
 };
 
-promptUser().then(answers => console.log(answers));
+promptUser()
+.then(promptProject)
+.then(portfolioData => {
+  console.log(portfolioData);
+  // will be uncommented in lesson 4
+  // const pageHTML = generatePage(portfolioData);
+  // fs.writeFile('./index.html', pageHTML, err => {
+  //   if (err) throw new Error(err);
+  //   console.log('Page created! Check out index.html in this directory to see it!');
+  // });
+});
+
